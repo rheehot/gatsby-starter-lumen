@@ -7,7 +7,7 @@ const createTagsPages = require('./pagination/create-tags-pages.js');
 const createPostsPages = require('./pagination/create-posts-pages.js');
 
 const createPages = async ({ graphql, actions }) => {
-  const { createPage } = actions;
+  const { createPage, createRedirect } = actions;
 
   // 404
   createPage({
@@ -30,9 +30,7 @@ const createPages = async ({ graphql, actions }) => {
   // Posts and pages from markdown
   const result = await graphql(`
     {
-      allMarkdownRemark(
-        filter: { frontmatter: { draft: { ne: true } } }
-      ) {
+      allMarkdownRemark(filter: { frontmatter: { draft: { ne: true } } }) {
         edges {
           node {
             frontmatter {
@@ -69,7 +67,13 @@ const createPages = async ({ graphql, actions }) => {
   await createTagsPages(graphql, actions);
   await createCategoriesPages(graphql, actions);
   await createPostsPages(graphql, actions);
-};
 
+  createRedirect({
+    fromPath: '/',
+    isPermanent: true,
+    redirectInBrowser: true,
+    toPath: '/pages/about'
+  });
+};
 
 module.exports = createPages;
